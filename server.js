@@ -4,11 +4,7 @@ const bcrypt = require("bcrypt");
 const pool = require("./db");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
-const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-    console.log(`Server running on ${PORT}`);
-});
 
 
 const app = express();
@@ -336,5 +332,9 @@ app.post("/addoption", auth, async (req, res) => {
     res.sendStatus(200);
 });
 
+const PORT = process.env.PORT || 3000;
 
+app.listen(PORT, () => {
+    console.log(`Server running on ${PORT}`);
+});
 
