@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- page settings -->
+    <title>Page Title</title>
+
+    <!-- CSS link -->
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<script>
+    async function checkLogin() {
+        try {
+            const response = await fetch("/api/me");
+            const data = await response.json();
+
+            if (data.loggedIn) {
+                document.getElementById("navbar-links").innerHTML = `
+                <li><a href="/">Home</a></li>
+                <li><a href="/mypolls">My Polls</a></li>
+                <li><a href="/newpoll">New Polls</a></li>
+                <li><a href="/logout">Logout</a></li>
+            `;
+
+                document.querySelector(".logo").textContent =
+                    `Welcome ${data.username}`;
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    checkLogin();
+</script>
+
+<body>
+
+    <!-- Everything visible on the page -->
+    <nav>
+        <div class="logo">Welcome</div>
+
+        <ul id="navbar-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="signup.html">Signup</a></li>
+        </ul>
+    </nav>
+    <h1 class="page-title">FCC Voting App</h1>
+
+
+    <div id="polls-container"></div>
+    <script>
+
+        async function loadPolls() {
+
+            try {
+
+                const response = await fetch("/api/polls");
+                const polls = await response.json();
+
+                const container =
+                    document.getElementById("polls-container");
+
+                container.innerHTML = "";
+
+                polls.forEach(poll => {
+
+                    const optionsHtml =
+                        poll.options.map(option => `
+                    <option value="${option.id}">
+                        ${option.option_text}
+                    </option>
+                `).join("");
+
+                    const form =
+                        document.createElement("form");
+
+                    form.className = "poll-card";
+                    form.action = "/vote";
+                    form.method = "POST";
+
+                    form.innerHTML = `
+                        <p>${poll.question}</p>
+
+                        <input
+                        type="hidden"
+                        name="poll_id"
+                        value="${poll.id}"
+                    >
+
+                    <select name="option_id">
+                        ${optionsHtml}
+                    </select>
+
+                    <button type="submit">
+                        Vote
+                    </button>
+
+                    <div class="add-option-section">
+
+                        <input
+                            type="text"
+                            id="new-option-${poll.id}"
+                            placeholder="Add new option"
+                        >
+
+                        <button
+                            type="button"
+                            onclick="addOption(${poll.id})">
+                            Add Option
+                        </button>
+
+                    </div>
+
+                    <canvas
+                        id="chart-${poll.id}"
+                        width="220"
+                        height="220">
+                    </canvas>
+                    `;
+
+                    container.appendChild(form);
+                    loadResults(poll.id);
+
+                });
+
+            } catch (err) {
+
+                console.log(err);
+
+            }
+
+        }
+        async function loadResults(pollId) {
+
+            try {
+
+                const res = await fetch(`/api/polls/${pollId}/results`);
+                const data = await res.json();
+
+                const ctx = document.getElementById(`chart-${pollId}`);
+
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: data.map(d => d.option_text),
+                        datasets: [{
+                            data: data.map(d => d.votes),
+                            backgroundColor: [
+                                '#60a5fa',
+                                '#f87171',
+                                '#34d399',
+                                '#fbbf24',
+                                '#a78bfa',
+                                '#fb7185'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: false
+                    }
+                });
+
+            } catch (err) {
+                console.log(err);
+            }
+        }
+        loadPolls();
+
+        async function addOption(pollId) {
+
+            const input =
+                document.getElementById(
+                `new-option-${pollId}`
+            );
+
+            const optionText = input.value.trim();
+
+            if (!optionText) {
+                return;
+            }
+
+            const response = await fetch(
+                "/addoption",
+                {
+                method: "POST",
+                headers: {
+                "Content-Type":
+                    "application/json"
+                },
+                body: JSON.stringify({
+                poll_id: pollId,
+                option_text: optionText
+                })
+                }
+            );
+
+            if (response.ok) {
+            loadPolls();
+            }
+        }
+
+    </script>
+</body>
+
+</html>

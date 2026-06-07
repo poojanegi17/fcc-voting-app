@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>New Poll</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+```
+<nav>
+    <div class="logo">Welcome</div>
+
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/mypolls">My Polls</a></li>
+        <li><a href="/logout">Logout</a></li>
+    </ul>
+</nav>
+
+<h1 class="page-title">New Poll</h1>
+
+<form class="poll-create-card" action="/createpoll" method="POST">
+
+    <div class="question-row">
+        <label>Question</label>
+
+        <input
+            type="text"
+            name="question"
+            placeholder="Enter your question"
+            required>
+    </div>
+
+    <div class="options-section">
+
+        <label>
+            Options (separate by commas)
+        </label>
+
+        <textarea
+            name="options"
+            rows="8"
+            placeholder="Java, Python, C++, JavaScript"
+            required>
+        </textarea>
+
+    </div>
+
+    <button type="submit">
+        Create Poll
+    </button>
+
+</form>
+```
+
+</body>
+
+</html>

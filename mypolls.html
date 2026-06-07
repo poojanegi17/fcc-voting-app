@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>My Polls</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <nav>
+        <div class="logo">My Polls</div>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/newpoll">New Poll</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+
+    </nav>
+
+    <h1 class="page-title">My Polls</h1>
+
+    <div id="polls-container">
+
+    </div>
+
+    <script>
+        async function sharePoll(id) {
+
+            await fetch(`/sharepoll/${id}`, {
+            method: "POST"
+        });
+
+        loadPolls();
+        }
+        async function deletePoll(id) {
+
+            await fetch(`/deletepoll/${id}`, {
+            method: "POST"
+        });
+ 
+        loadPolls();
+        }
+
+        async function loadPolls() {
+
+            try {
+
+                const response = await fetch("/api/mypolls");
+                const polls = await response.json();
+
+                const container =
+                    document.getElementById("polls-container");
+
+                container.innerHTML = "";
+
+                polls.forEach(poll => {
+
+                    const card =
+                        document.createElement("form");
+
+                    card.className = "poll-card";
+
+                    const resultsHtml =
+                        poll.results.map(result => `
+                            <p>
+                                ${result.option_text}
+                                : ${result.votes} votes
+                            </p>
+                        `).join("");
+
+                    card.innerHTML = `
+                        <p>${poll.question}</p>
+
+                        ${resultsHtml}
+
+                            <p>
+                                Status:
+                                ${poll.published ? "Published" : "Draft"}
+                            </p>
+
+                        <div class="poll-actions">
+
+                        ${
+                            !poll.published
+                            ? `
+                                <button
+                                    type="button"
+                                    onclick="sharePoll(${poll.id})">
+                                    Share
+                                </button>
+                              `
+                            : ""
+                        }
+
+                            <button
+                                type="button"
+                                    onclick="deletePoll(${poll.id})">
+                                Delete
+                            </button>
+
+                        </div>
+                        `;
+
+                    container.appendChild(card);
+
+                });
+
+            } catch (err) {
+
+                console.log(err);
+
+            }
+
+        }
+
+loadPolls();
+    </script>
+
+</body>
+
+</html>

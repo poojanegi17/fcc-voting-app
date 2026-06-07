@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- page settings -->
+    <title>Page Title</title>
+
+    <!-- CSS link -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Everything visible on the page -->
+    <nav>
+        <div class="logo">Welcome</div>
+
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="signup.html">Signup</a></li>
+        </ul>
+    </nav>
+
+    <form class="form-container" action="/login" method="POST">
+
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+
+        <br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+
+        <br>
+
+        <button type="submit">Login</button>
+
+    </form>
+
+</body>
+
+</html>
